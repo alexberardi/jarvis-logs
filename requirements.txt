@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic
+httpx
+python-dotenv
+
+# Testing
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-httpx>=0.21.0
+httpx[http2]

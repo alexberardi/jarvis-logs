@@ -1,0 +1,62 @@
+from contextlib import asynccontextmanager
+from datetime import datetime
+
+from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.auth import require_app_auth
+from app.loki_client import loki_client
+from app.routes import logs
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan - startup and shutdown."""
+    # Startup
+    yield
+    # Shutdown
+    await loki_client.close()
+
+
+app = FastAPI(
+    title="Jarvis Logs",
+    description="Centralized logging service for jarvis microservices",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+# CORS middleware for development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routes (protected with app-to-app auth)
+app.include_router(
+    logs.router,
+    prefix="/api/v0",
+    tags=["logs"],
+    dependencies=[Depends(require_app_auth)],
+)
+
+
+@app.get("/health")
+async def health_check() -> dict:
+    """Health check endpoint."""
+    loki_healthy = await loki_client.health_check()
+    return {
+        "status": "healthy" if loki_healthy else "degraded",
+        "timestamp": datetime.utcnow().isoformat(),
+        "services": {
+            "loki": "available" if loki_healthy else "unavailable",
+        },
+    }
+
+
+@app.get("/ping")
+async def ping() -> dict:
+    """Simple ping endpoint."""
+    return {"message": "pong"}
