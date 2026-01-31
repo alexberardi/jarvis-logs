@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.auth import require_app_auth
 from app.loki_client import loki_client
-from app.routes import logs
+from app.routes import logs, node_logs
 
 
 @asynccontextmanager
@@ -34,12 +34,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routes (protected with app-to-app auth)
+# Include app-authenticated routes (services)
 app.include_router(
     logs.router,
     prefix="/api/v0",
     tags=["logs"],
     dependencies=[Depends(require_app_auth)],
+)
+
+# Include node-authenticated routes (nodes use their own auth)
+app.include_router(
+    node_logs.router,
+    prefix="/api/v0",
+    tags=["node-logs"],
 )
 
 
