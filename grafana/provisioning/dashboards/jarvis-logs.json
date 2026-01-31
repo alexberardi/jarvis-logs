@@ -12,7 +12,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "loki"
+        "uid": "P8E80F9AEF21F6940"
       },
       "gridPos": {
         "h": 4,
@@ -35,7 +35,7 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "loki"
+            "uid": "P8E80F9AEF21F6940"
           },
           "editorMode": "builder",
           "expr": "{level=\"ERROR\"} | json",
@@ -49,7 +49,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "loki"
+        "uid": "P8E80F9AEF21F6940"
       },
       "fieldConfig": {
         "defaults": {
@@ -185,7 +185,7 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "loki"
+            "uid": "P8E80F9AEF21F6940"
           },
           "editorMode": "code",
           "expr": "sum by (level) (count_over_time({service=~\".+\"}[1m]))",
@@ -200,7 +200,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "loki"
+        "uid": "P8E80F9AEF21F6940"
       },
       "fieldConfig": {
         "defaults": {
@@ -275,7 +275,7 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "loki"
+            "uid": "P8E80F9AEF21F6940"
           },
           "editorMode": "code",
           "expr": "sum by (service) (count_over_time({service=~\".+\"}[1m]))",
@@ -290,7 +290,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "loki"
+        "uid": "P8E80F9AEF21F6940"
       },
       "gridPos": {
         "h": 12,
@@ -313,7 +313,7 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "loki"
+            "uid": "P8E80F9AEF21F6940"
           },
           "editorMode": "builder",
           "expr": "{service=~\"$service\", level=~\"$level\"}",
@@ -322,6 +322,80 @@
         }
       ],
       "title": "All Logs",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "P8E80F9AEF21F6940"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 22
+      },
+      "id": 5,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "editorMode": "builder",
+          "expr": "{service=\"jarvis-tts\"} | json",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "jarvis-tts",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "P8E80F9AEF21F6940"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 22
+      },
+      "id": 6,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "editorMode": "builder",
+          "expr": "{service=\"jarvis-whisper\"} | json",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "jarvis-whisper",
       "type": "logs"
     }
   ],
@@ -338,7 +412,7 @@
         },
         "datasource": {
           "type": "loki",
-          "uid": "loki"
+          "uid": "P8E80F9AEF21F6940"
         },
         "definition": "",
         "hide": 0,
@@ -367,7 +441,7 @@
         },
         "datasource": {
           "type": "loki",
-          "uid": "loki"
+          "uid": "P8E80F9AEF21F6940"
         },
         "definition": "",
         "hide": 0,
