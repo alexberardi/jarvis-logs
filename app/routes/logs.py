@@ -1,4 +1,5 @@
 import asyncio
+import json
 from datetime import datetime
 from typing import Any
 
@@ -67,7 +68,6 @@ async def stream_logs(
                 limit=50,
             )
             for log in reversed(logs):  # Oldest first for streaming
-                import json
                 yield f"data: {json.dumps(log)}\n\n"
                 # Update last_seen to the log's timestamp
                 log_ts = datetime.fromisoformat(log["timestamp"])

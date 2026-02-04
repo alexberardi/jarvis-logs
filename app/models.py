@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from typing import Any
 
@@ -18,7 +19,6 @@ class LogEntry(BaseModel):
         ts_ns = str(int(self.timestamp.timestamp() * 1e9))
         log_line = self.message
         if self.context:
-            import json
             log_line = f"{self.message} | {json.dumps(self.context)}"
         return ts_ns, log_line
 

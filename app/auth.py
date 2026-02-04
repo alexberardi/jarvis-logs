@@ -1,3 +1,5 @@
+import json
+import logging
 import os
 import time
 from dataclasses import dataclass
@@ -6,6 +8,8 @@ from typing import Optional
 
 import httpx
 from fastapi import Header, HTTPException, Request
+
+logger = logging.getLogger(__name__)
 
 
 async def require_app_auth(
@@ -53,7 +57,8 @@ async def require_app_auth(
     try:
         body = resp.json()
         request.state.calling_app_id = body.get("app_id") or x_jarvis_app_id
-    except Exception:
+    except (json.JSONDecodeError, ValueError, TypeError, KeyError) as exc:
+        logger.debug("Failed to parse app_id from auth response: %s", exc)
         request.state.calling_app_id = x_jarvis_app_id
 
 
@@ -147,7 +152,8 @@ async def validate_node_credentials(
         )
         _cache_validation(cache_key, result)
         return result
-    except Exception as exc:
+    except (json.JSONDecodeError, ValueError, TypeError, KeyError) as exc:
+        logger.debug("Failed to parse node validation response: %s", exc)
         return NodeValidationResult(valid=False, reason=f"Invalid response from auth service: {exc}")
 
 
