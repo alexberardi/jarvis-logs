@@ -18,7 +18,6 @@ from jarvis_settings_client.types import SettingValue
 
 from app.services.settings_definitions import SETTINGS_DEFINITIONS
 from app.services.settings_service import (
-    LogsSettingsService,
     get_settings_service,
     reset_settings_service,
 )
@@ -56,38 +55,13 @@ class TestSettingsDefinitions:
         assert "server.port" in keys
 
 
-class TestLogsSettingsService:
-    """Tests for LogsSettingsService helper methods."""
-
-    @pytest.fixture
-    def service(self):
-        """Create a service instance for testing."""
-        return LogsSettingsService(
-            definitions=SETTINGS_DEFINITIONS,
-            get_db_session=lambda: None,
-            setting_model=None,
-        )
-
-    def test_get_logs_config(self, service):
-        """Test get_logs_config method."""
-        with patch.dict(os.environ, {
-            "LOG_RETENTION_DAYS": "60",
-            "LOG_MAX_BATCH_SIZE": "2000",
-            "LOG_QUERY_LIMIT": "5000",
-        }):
-            config = service.get_logs_config()
-            assert config["retention_days"] == 60
-            assert config["max_batch_size"] == 2000
-            assert config["query_limit"] == 5000
-
-
 class TestSettingsServiceCache:
     """Tests for SettingsService caching behavior."""
 
     @pytest.fixture
     def service(self):
         """Create a service instance for testing."""
-        return LogsSettingsService(
+        return SettingsService(
             definitions=SETTINGS_DEFINITIONS,
             get_db_session=lambda: None,
             setting_model=None,
@@ -165,7 +139,7 @@ class TestSettingsServiceEnvFallback:
     @pytest.fixture
     def service(self):
         """Create a service instance for testing."""
-        return LogsSettingsService(
+        return SettingsService(
             definitions=SETTINGS_DEFINITIONS,
             get_db_session=lambda: None,
             setting_model=None,
@@ -196,7 +170,7 @@ class TestSettingsServiceTypedGetters:
     @pytest.fixture
     def service(self):
         """Create a service instance for testing."""
-        return LogsSettingsService(
+        return SettingsService(
             definitions=SETTINGS_DEFINITIONS,
             get_db_session=lambda: None,
             setting_model=None,
@@ -216,7 +190,7 @@ class TestSettingsServiceListMethods:
     @pytest.fixture
     def service(self):
         """Create a service instance for testing."""
-        return LogsSettingsService(
+        return SettingsService(
             definitions=SETTINGS_DEFINITIONS,
             get_db_session=lambda: None,
             setting_model=None,
