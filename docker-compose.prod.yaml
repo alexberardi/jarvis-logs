@@ -13,7 +13,7 @@ services:
       - JARVIS_LOGS_APP_ID=${JARVIS_LOGS_APP_ID:-jarvis-logs}
       - JARVIS_LOGS_APP_KEY=${JARVIS_LOGS_APP_KEY}
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "${DOCKER_HOST_ALIAS:-host.docker.internal}:host-gateway"
     depends_on:
       - loki
     networks:
