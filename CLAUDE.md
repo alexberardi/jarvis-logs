@@ -15,7 +15,7 @@ Centralized logging service. Receives logs from microservices, stores in Loki, v
 ./run-tests.sh
 
 # Grafana dashboard
-open http://localhost:3000  # admin/jarvis
+open http://localhost:8015  # admin/jarvis
 ```
 
 ## Architecture
@@ -67,7 +67,7 @@ curl "http://localhost:8006/api/v0/logs?service=auth&level=ERROR&since_minutes=6
 | Service | Port | Purpose |
 |---------|------|---------|
 | Loki | 3100 | Log storage/indexing |
-| Grafana | 3000 | Dashboards |
+| Grafana | 8015 | Dashboards |
 | API | 8006 | REST interface |
 
 ## Authentication

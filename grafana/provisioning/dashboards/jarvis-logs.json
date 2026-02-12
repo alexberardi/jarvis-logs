@@ -316,7 +316,7 @@
             "uid": "P8E80F9AEF21F6940"
           },
           "editorMode": "builder",
-          "expr": "{service=~\"$service\", level=~\"$level\"}",
+          "expr": "{service=~\".+\"} | level=~\"$level\" | service=~\"$service\"",
           "queryType": "range",
           "refId": "A"
         }
