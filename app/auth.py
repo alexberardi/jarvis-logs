@@ -92,8 +92,8 @@ def _cache_validation(cache_key: str, result: NodeValidationResult) -> None:
 
 def _get_service_credentials() -> tuple[str, str]:
     """Get jarvis-logs app credentials for authenticating to jarvis-auth."""
-    app_id = os.getenv("JARVIS_LOGS_APP_ID", "jarvis-logs")
-    app_key = os.getenv("JARVIS_LOGS_APP_KEY")
+    app_id = os.getenv("JARVIS_APP_ID", "jarvis-logs")
+    app_key = os.getenv("JARVIS_APP_KEY")
     return app_id, app_key
 
 
@@ -117,7 +117,7 @@ async def validate_node_credentials(
 
     app_id, app_key = _get_service_credentials()
     if not app_key:
-        return NodeValidationResult(valid=False, reason="JARVIS_LOGS_APP_KEY not configured")
+        return NodeValidationResult(valid=False, reason="JARVIS_APP_KEY not configured")
 
     validate_url = jarvis_auth_base.rstrip("/") + "/internal/validate-node"
 

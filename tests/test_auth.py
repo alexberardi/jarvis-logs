@@ -317,22 +317,22 @@ class TestValidateNodeCredentials:
 
     @pytest.mark.asyncio
     async def test_missing_app_key(self):
-        """Test that missing JARVIS_LOGS_APP_KEY returns invalid result."""
+        """Test that missing JARVIS_APP_KEY returns invalid result."""
         os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-        old_key = os.environ.pop("JARVIS_LOGS_APP_KEY", None)
+        old_key = os.environ.pop("JARVIS_APP_KEY", None)
         try:
             result = await validate_node_credentials("node-1", "key-1", "jarvis-logs")
             assert result.valid is False
-            assert "JARVIS_LOGS_APP_KEY not configured" in result.reason
+            assert "JARVIS_APP_KEY not configured" in result.reason
         finally:
             if old_key:
-                os.environ["JARVIS_LOGS_APP_KEY"] = old_key
+                os.environ["JARVIS_APP_KEY"] = old_key
 
     @pytest.mark.asyncio
     async def test_successful_validation(self, httpx_mock: HTTPXMock):
         """Test successful node credential validation."""
         os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-        os.environ["JARVIS_LOGS_APP_KEY"] = "test-app-key"
+        os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/validate-node",
@@ -350,7 +350,7 @@ class TestValidateNodeCredentials:
     async def test_invalid_credentials(self, httpx_mock: HTTPXMock):
         """Test invalid node credentials."""
         os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-        os.environ["JARVIS_LOGS_APP_KEY"] = "test-app-key"
+        os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/validate-node",
@@ -367,7 +367,7 @@ class TestValidateNodeCredentials:
     async def test_no_service_access(self, httpx_mock: HTTPXMock):
         """Test node without service access."""
         os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-        os.environ["JARVIS_LOGS_APP_KEY"] = "test-app-key"
+        os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/validate-node",
@@ -386,7 +386,7 @@ class TestValidateNodeCredentials:
         import httpx
 
         os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-        os.environ["JARVIS_LOGS_APP_KEY"] = "test-app-key"
+        os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_exception(httpx.ConnectError("Connection refused"))
 
@@ -398,7 +398,7 @@ class TestValidateNodeCredentials:
     async def test_auth_service_error(self, httpx_mock: HTTPXMock):
         """Test handling auth service error response."""
         os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-        os.environ["JARVIS_LOGS_APP_KEY"] = "test-app-key"
+        os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/validate-node",
@@ -414,7 +414,7 @@ class TestValidateNodeCredentials:
     async def test_caching(self, httpx_mock: HTTPXMock):
         """Test that validation results are cached."""
         os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-        os.environ["JARVIS_LOGS_APP_KEY"] = "test-app-key"
+        os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/validate-node",
@@ -468,7 +468,7 @@ class TestRequireNodeAuth:
     async def test_successful_auth(self, mock_node_request, httpx_mock: HTTPXMock):
         """Test successful node authentication."""
         os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-        os.environ["JARVIS_LOGS_APP_KEY"] = "test-app-key"
+        os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/validate-node",
@@ -493,7 +493,7 @@ class TestRequireNodeAuth:
     async def test_invalid_credentials_raises_403(self, mock_node_request, httpx_mock: HTTPXMock):
         """Test that invalid credentials raise 403."""
         os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-        os.environ["JARVIS_LOGS_APP_KEY"] = "test-app-key"
+        os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/validate-node",
@@ -515,8 +515,8 @@ class TestRequireNodeAuth:
     async def test_headers_forwarded(self, mock_node_request, httpx_mock: HTTPXMock):
         """Test that app credentials are forwarded to auth service."""
         os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-        os.environ["JARVIS_LOGS_APP_ID"] = "jarvis-logs"
-        os.environ["JARVIS_LOGS_APP_KEY"] = "logs-secret-key"
+        os.environ["JARVIS_APP_ID"] = "jarvis-logs"
+        os.environ["JARVIS_APP_KEY"] = "logs-secret-key"
 
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/validate-node",
