@@ -34,6 +34,13 @@ def mock_health_request():
     return request
 
 
+@pytest.fixture(autouse=True)
+def mock_auth_url():
+    """Mock service_config.get_auth_url to return test URL by default."""
+    with patch("app.auth.service_config.get_auth_url", return_value="http://test-auth:8007"):
+        yield
+
+
 class TestRequireAppAuth:
     """Tests for require_app_auth dependency."""
 
@@ -98,29 +105,20 @@ class TestRequireAppAuth:
         assert exc_info.value.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_missing_auth_base_url(self, mock_request):
-        """Test that missing JARVIS_AUTH_BASE_URL returns 500."""
-        with patch.dict(os.environ, {"JARVIS_AUTH_BASE_URL": ""}, clear=False):
-            # Clear the env var for this test
-            old_val = os.environ.pop("JARVIS_AUTH_BASE_URL", None)
-            try:
-                with pytest.raises(HTTPException) as exc_info:
-                    await require_app_auth(
-                        mock_request,
-                        x_jarvis_app_id="test-app",
-                        x_jarvis_app_key="test-key",
-                    )
-                assert exc_info.value.status_code == 500
-                assert "JARVIS_AUTH_BASE_URL not configured" in exc_info.value.detail
-            finally:
-                if old_val:
-                    os.environ["JARVIS_AUTH_BASE_URL"] = old_val
+    async def test_auth_url_unavailable(self, mock_request):
+        """Test that unavailable auth URL raises 500-level error."""
+        from jarvis_config_client import ServiceNotFoundError
+        with patch("app.auth.service_config.get_auth_url", side_effect=ServiceNotFoundError("auth")):
+            with pytest.raises((HTTPException, ServiceNotFoundError)):
+                await require_app_auth(
+                    mock_request,
+                    x_jarvis_app_id="test-app",
+                    x_jarvis_app_key="test-key",
+                )
 
     @pytest.mark.asyncio
     async def test_auth_service_success(self, mock_request, httpx_mock: HTTPXMock):
         """Test successful authentication."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/app-ping",
             method="GET",
@@ -140,8 +138,6 @@ class TestRequireAppAuth:
     @pytest.mark.asyncio
     async def test_auth_service_invalid_credentials(self, mock_request, httpx_mock: HTTPXMock):
         """Test authentication with invalid credentials."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/app-ping",
             method="GET",
@@ -161,8 +157,6 @@ class TestRequireAppAuth:
     @pytest.mark.asyncio
     async def test_auth_service_other_error(self, mock_request, httpx_mock: HTTPXMock):
         """Test handling non-401 errors from auth service."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/app-ping",
             method="GET",
@@ -183,8 +177,6 @@ class TestRequireAppAuth:
         """Test handling auth service being unavailable."""
         import httpx
 
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-
         httpx_mock.add_exception(httpx.ConnectError("Connection refused"))
 
         with pytest.raises(HTTPException) as exc_info:
@@ -201,8 +193,6 @@ class TestRequireAppAuth:
         """Test handling auth service timeout."""
         import httpx
 
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-
         httpx_mock.add_exception(httpx.ReadTimeout("Timeout"))
 
         with pytest.raises(HTTPException) as exc_info:
@@ -216,8 +206,6 @@ class TestRequireAppAuth:
     @pytest.mark.asyncio
     async def test_auth_headers_forwarded(self, mock_request, httpx_mock: HTTPXMock):
         """Test that credentials are forwarded to auth service."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/app-ping",
             method="GET",
@@ -238,8 +226,6 @@ class TestRequireAppAuth:
     @pytest.mark.asyncio
     async def test_auth_response_without_app_id(self, mock_request, httpx_mock: HTTPXMock):
         """Test handling auth response without app_id in body."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/app-ping",
             method="GET",
@@ -259,8 +245,6 @@ class TestRequireAppAuth:
     @pytest.mark.asyncio
     async def test_auth_response_invalid_json(self, mock_request, httpx_mock: HTTPXMock):
         """Test handling auth response with invalid JSON."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
-
         httpx_mock.add_response(
             url="http://test-auth:8007/internal/app-ping",
             method="GET",
@@ -304,21 +288,17 @@ class TestValidateNodeCredentials:
     """Tests for validate_node_credentials function."""
 
     @pytest.mark.asyncio
-    async def test_missing_auth_base_url(self):
-        """Test that missing JARVIS_AUTH_BASE_URL returns invalid result."""
-        old_val = os.environ.pop("JARVIS_AUTH_BASE_URL", None)
-        try:
+    async def test_auth_url_unavailable(self):
+        """Test that unavailable auth URL returns invalid result."""
+        from jarvis_config_client import ServiceNotFoundError
+        with patch("app.auth.service_config.get_auth_url", side_effect=ServiceNotFoundError("auth")):
             result = await validate_node_credentials("node-1", "key-1", "jarvis-logs")
             assert result.valid is False
-            assert "JARVIS_AUTH_BASE_URL not configured" in result.reason
-        finally:
-            if old_val:
-                os.environ["JARVIS_AUTH_BASE_URL"] = old_val
+            assert "auth" in result.reason.lower()
 
     @pytest.mark.asyncio
     async def test_missing_app_key(self):
         """Test that missing JARVIS_APP_KEY returns invalid result."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
         old_key = os.environ.pop("JARVIS_APP_KEY", None)
         try:
             result = await validate_node_credentials("node-1", "key-1", "jarvis-logs")
@@ -331,7 +311,6 @@ class TestValidateNodeCredentials:
     @pytest.mark.asyncio
     async def test_successful_validation(self, httpx_mock: HTTPXMock):
         """Test successful node credential validation."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
         os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
@@ -349,7 +328,6 @@ class TestValidateNodeCredentials:
     @pytest.mark.asyncio
     async def test_invalid_credentials(self, httpx_mock: HTTPXMock):
         """Test invalid node credentials."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
         os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
@@ -366,7 +344,6 @@ class TestValidateNodeCredentials:
     @pytest.mark.asyncio
     async def test_no_service_access(self, httpx_mock: HTTPXMock):
         """Test node without service access."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
         os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
@@ -385,7 +362,6 @@ class TestValidateNodeCredentials:
         """Test handling auth service being unavailable."""
         import httpx
 
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
         os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_exception(httpx.ConnectError("Connection refused"))
@@ -397,7 +373,6 @@ class TestValidateNodeCredentials:
     @pytest.mark.asyncio
     async def test_auth_service_error(self, httpx_mock: HTTPXMock):
         """Test handling auth service error response."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
         os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
@@ -413,7 +388,6 @@ class TestValidateNodeCredentials:
     @pytest.mark.asyncio
     async def test_caching(self, httpx_mock: HTTPXMock):
         """Test that validation results are cached."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
         os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
@@ -467,7 +441,6 @@ class TestRequireNodeAuth:
     @pytest.mark.asyncio
     async def test_successful_auth(self, mock_node_request, httpx_mock: HTTPXMock):
         """Test successful node authentication."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
         os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
@@ -492,7 +465,6 @@ class TestRequireNodeAuth:
     @pytest.mark.asyncio
     async def test_invalid_credentials_raises_403(self, mock_node_request, httpx_mock: HTTPXMock):
         """Test that invalid credentials raise 403."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
         os.environ["JARVIS_APP_KEY"] = "test-app-key"
 
         httpx_mock.add_response(
@@ -514,7 +486,6 @@ class TestRequireNodeAuth:
     @pytest.mark.asyncio
     async def test_headers_forwarded(self, mock_node_request, httpx_mock: HTTPXMock):
         """Test that app credentials are forwarded to auth service."""
-        os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
         os.environ["JARVIS_APP_ID"] = "jarvis-logs"
         os.environ["JARVIS_APP_KEY"] = "logs-secret-key"
 

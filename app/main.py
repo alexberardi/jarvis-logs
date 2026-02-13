@@ -13,8 +13,10 @@ from app.routes import logs, node_logs
 async def lifespan(app: FastAPI):
     """Manage application lifespan - startup and shutdown."""
     # Startup
+    service_config.init()
     yield
     # Shutdown
+    service_config.shutdown()
     await loki_client.close()
 
 
@@ -50,16 +52,14 @@ app.include_router(
 )
 
 # Add settings router from shared library
-import os as _os
-
 from jarvis_settings_client import create_settings_router, create_superuser_auth
 from app.services.settings_service import get_settings_service
+from app import service_config
 
-_auth_url = _os.getenv("JARVIS_AUTH_BASE_URL", "http://localhost:8007")
 _settings_router = create_settings_router(
     service=get_settings_service(),
     auth_dependency=require_app_auth,
-    write_auth_dependency=create_superuser_auth(_auth_url),
+    write_auth_dependency=create_superuser_auth(service_config.get_auth_url),
 )
 app.include_router(_settings_router, prefix="/settings", tags=["settings"])
 

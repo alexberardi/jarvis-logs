@@ -8,6 +8,8 @@ from typing import Optional
 import httpx
 from fastapi import Header, HTTPException, Request
 
+from app import service_config
+
 logger = logging.getLogger(__name__)
 
 
@@ -27,10 +29,7 @@ async def require_app_auth(
     if not x_jarvis_app_id or not x_jarvis_app_key:
         raise HTTPException(status_code=401, detail="Missing app credentials")
 
-    jarvis_auth_base = os.getenv("JARVIS_AUTH_BASE_URL")
-    if not jarvis_auth_base:
-        raise HTTPException(status_code=500, detail="JARVIS_AUTH_BASE_URL not configured")
-
+    jarvis_auth_base = service_config.get_auth_url()
     app_ping = jarvis_auth_base.rstrip("/") + "/internal/app-ping"
     async with httpx.AsyncClient(timeout=5.0) as client:
         try:
@@ -111,9 +110,10 @@ async def validate_node_credentials(
     if cached is not None:
         return cached
 
-    jarvis_auth_base = os.getenv("JARVIS_AUTH_BASE_URL")
-    if not jarvis_auth_base:
-        return NodeValidationResult(valid=False, reason="JARVIS_AUTH_BASE_URL not configured")
+    try:
+        jarvis_auth_base = service_config.get_auth_url()
+    except RuntimeError as e:
+        return NodeValidationResult(valid=False, reason=str(e))
 
     app_id, app_key = _get_service_credentials()
     if not app_key:

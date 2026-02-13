@@ -12,6 +12,7 @@ services:
       - JARVIS_AUTH_BASE_URL=${JARVIS_AUTH_BASE_URL:-http://host.docker.internal:8007}
       - JARVIS_APP_ID=${JARVIS_APP_ID:-jarvis-logs}
       - JARVIS_APP_KEY=${JARVIS_APP_KEY}
+      - JARVIS_CONFIG_URL=${JARVIS_CONFIG_URL:-http://host.docker.internal:8013}
     extra_hosts:
       - "${DOCKER_HOST_ALIAS:-host.docker.internal}:host-gateway"
     volumes:
