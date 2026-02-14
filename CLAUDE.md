@@ -5,6 +5,10 @@ Centralized logging service. Receives logs from microservices, stores in Loki, v
 ## Quick Reference
 
 ```bash
+# Setup
+python3 -m venv .venv
+.venv/bin/pip install -e ".[dev]"
+
 # Run full stack (Loki + Grafana + API)
 ./run.sh
 
@@ -77,6 +81,21 @@ Credentials validated against jarvis-auth service.
 
 ## Dependencies
 
+**Python Libraries:**
 - FastAPI, httpx
-- Loki (log storage)
-- Grafana (visualization)
+
+**Service Dependencies:**
+- ✅ **Required**: Loki (3100) - Log storage and indexing
+- ✅ **Required**: Grafana (8015) - Visualization and dashboards
+- ✅ **Required**: `jarvis-auth` (8007) - App-to-app authentication validation
+- ⚠️ **Optional**: `jarvis-config-service` (8013) - Service discovery
+
+**Used By:**
+- ALL services via `jarvis-log-client` library
+- `jarvis-mcp` - Log querying tools for Claude Code
+
+**Impact if Down:**
+- ⚠️ Logs go to console only (services continue running)
+- ⚠️ No centralized log aggregation
+- ⚠️ No Grafana dashboards
+- ✅ Services degrade gracefully (console logging fallback)

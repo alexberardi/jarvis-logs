@@ -4,10 +4,10 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
 COPY app/ ./app
+
+COPY pyproject.toml .
+RUN pip install --no-cache-dir .
 
 ENV LOG_SERVER_PORT=8006
 EXPOSE ${LOG_SERVER_PORT}
