@@ -7,7 +7,7 @@ Centralized logging service for jarvis microservices. Receives logs via REST API
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌────────────────┐     ┌────────────────┐
 │  Microservices  │────▶│  jarvis-logs     │────▶│  Loki          │────▶│  Grafana       │
-│  (jarvis-log    │     │  FastAPI (8006)  │     │  (3100)        │     │  (3000)        │
+│  (jarvis-log    │     │  FastAPI (7702)  │     │  (7032)        │     │  (3000)        │
 │   client pkg)   │     └──────────────────┘     └────────────────┘     └────────────────┘
 └─────────────────┘
 ```
@@ -38,7 +38,7 @@ open http://localhost:3000
 
 ```bash
 # Send a log
-curl -X POST http://localhost:8006/api/v0/logs \
+curl -X POST http://localhost:7702/api/v0/logs \
   -H "Content-Type: application/json" \
   -d '{
     "service": "test-service",
@@ -48,16 +48,16 @@ curl -X POST http://localhost:8006/api/v0/logs \
   }'
 
 # Query logs
-curl "http://localhost:8006/api/v0/logs?service=test-service&limit=10"
+curl "http://localhost:7702/api/v0/logs?service=test-service&limit=10"
 
 # Filter by level
-curl "http://localhost:8006/api/v0/logs?level=ERROR&limit=50"
+curl "http://localhost:7702/api/v0/logs?level=ERROR&limit=50"
 
 # Search message content
-curl "http://localhost:8006/api/v0/logs?search=error&limit=20"
+curl "http://localhost:7702/api/v0/logs?search=error&limit=20"
 
 # Stream logs (SSE)
-curl -N "http://localhost:8006/api/v0/logs/stream?service=llm-proxy"
+curl -N "http://localhost:7702/api/v0/logs/stream?service=llm-proxy"
 ```
 
 ## Client Integration
@@ -85,8 +85,8 @@ logger.error("Something failed", error=str(e), request_id=req_id)
 
 | Service | Port | Description |
 |---------|------|-------------|
-| jarvis-logs | 8006 | REST API for log ingestion/query |
-| Loki | 3100 | Log storage and indexing |
+| jarvis-logs | 7702 | REST API for log ingestion/query |
+| Loki | 7032 | Log storage and indexing |
 | Grafana | 3000 | Dashboard and visualization |
 
 ## Grafana Dashboard
@@ -104,8 +104,8 @@ A pre-configured dashboard is available at `http://localhost:3000/d/jarvis-logs`
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LOKI_URL` | `http://loki:3100` | Loki server URL |
-| `LOG_SERVER_PORT` | `8006` | jarvis-logs port |
+| `LOKI_URL` | `http://loki:7032` | Loki server URL |
+| `LOG_SERVER_PORT` | `7702` | jarvis-logs port |
 | `LOG_API_KEY` | (none) | Optional API key for ingestion |
 | `ADMIN_API_KEY` | (none) | Admin operations key |
 

@@ -30,9 +30,9 @@ class TestLokiClientPush:
         self, sample_entry: LogEntry, httpx_mock: HTTPXMock
     ):
         """Test pushing a single log entry successfully."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url="http://test-loki:3100/loki/api/v1/push",
+            url="http://test-loki:7032/loki/api/v1/push",
             method="POST",
             status_code=204,
         )
@@ -46,9 +46,9 @@ class TestLokiClientPush:
         self, sample_entry: LogEntry, httpx_mock: HTTPXMock
     ):
         """Test pushing when Loki returns an error."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url="http://test-loki:3100/loki/api/v1/push",
+            url="http://test-loki:7032/loki/api/v1/push",
             method="POST",
             status_code=500,
         )
@@ -60,9 +60,9 @@ class TestLokiClientPush:
     @pytest.mark.asyncio
     async def test_push_batch_success(self, httpx_mock: HTTPXMock):
         """Test pushing a batch of entries."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url="http://test-loki:3100/loki/api/v1/push",
+            url="http://test-loki:7032/loki/api/v1/push",
             method="POST",
             status_code=204,
         )
@@ -86,9 +86,9 @@ class TestLokiClientPush:
     @pytest.mark.asyncio
     async def test_push_batch_groups_by_service_level(self, httpx_mock: HTTPXMock):
         """Test that batch push groups entries by service and level."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url="http://test-loki:3100/loki/api/v1/push",
+            url="http://test-loki:7032/loki/api/v1/push",
             method="POST",
             status_code=204,
         )
@@ -118,7 +118,7 @@ class TestLokiClientPush:
     @pytest.mark.asyncio
     async def test_push_batch_empty(self, httpx_mock: HTTPXMock):
         """Test pushing an empty batch returns True without making request."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         result = await client.push_batch([])
         assert result is True
         assert len(httpx_mock.get_requests()) == 0
@@ -130,7 +130,7 @@ class TestLokiClientPush:
     ):
         """Test handling network errors during push."""
         import httpx
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_exception(httpx.ConnectError("Connection refused"))
 
         result = await client.push(sample_entry)
@@ -144,9 +144,9 @@ class TestLokiClientQuery:
     @pytest.mark.asyncio
     async def test_query_basic(self, httpx_mock: HTTPXMock):
         """Test basic log query."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url=re.compile(r"http://test-loki:3100/loki/api/v1/query_range.*"),
+            url=re.compile(r"http://test-loki:7032/loki/api/v1/query_range.*"),
             method="GET",
             json={
                 "data": {
@@ -172,9 +172,9 @@ class TestLokiClientQuery:
     @pytest.mark.asyncio
     async def test_query_with_service_filter(self, httpx_mock: HTTPXMock):
         """Test query with service filter."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url=re.compile(r"http://test-loki:3100/loki/api/v1/query_range.*"),
+            url=re.compile(r"http://test-loki:7032/loki/api/v1/query_range.*"),
             method="GET",
             json={"data": {"result": []}},
         )
@@ -188,9 +188,9 @@ class TestLokiClientQuery:
     @pytest.mark.asyncio
     async def test_query_with_level_filter(self, httpx_mock: HTTPXMock):
         """Test query with level filter."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url=re.compile(r"http://test-loki:3100/loki/api/v1/query_range.*"),
+            url=re.compile(r"http://test-loki:7032/loki/api/v1/query_range.*"),
             method="GET",
             json={"data": {"result": []}},
         )
@@ -204,9 +204,9 @@ class TestLokiClientQuery:
     @pytest.mark.asyncio
     async def test_query_with_search(self, httpx_mock: HTTPXMock):
         """Test query with search term."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url=re.compile(r"http://test-loki:3100/loki/api/v1/query_range.*"),
+            url=re.compile(r"http://test-loki:7032/loki/api/v1/query_range.*"),
             method="GET",
             json={"data": {"result": []}},
         )
@@ -220,9 +220,9 @@ class TestLokiClientQuery:
     @pytest.mark.asyncio
     async def test_query_with_time_range(self, httpx_mock: HTTPXMock):
         """Test query with time range."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url=re.compile(r"http://test-loki:3100/loki/api/v1/query_range.*"),
+            url=re.compile(r"http://test-loki:7032/loki/api/v1/query_range.*"),
             method="GET",
             json={"data": {"result": []}},
         )
@@ -239,9 +239,9 @@ class TestLokiClientQuery:
     @pytest.mark.asyncio
     async def test_query_parses_context(self, httpx_mock: HTTPXMock):
         """Test that query parses context from log message."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url=re.compile(r"http://test-loki:3100/loki/api/v1/query_range.*"),
+            url=re.compile(r"http://test-loki:7032/loki/api/v1/query_range.*"),
             method="GET",
             json={
                 "data": {
@@ -265,9 +265,9 @@ class TestLokiClientQuery:
     @pytest.mark.asyncio
     async def test_query_handles_invalid_context_json(self, httpx_mock: HTTPXMock):
         """Test that invalid context JSON is handled gracefully."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url=re.compile(r"http://test-loki:3100/loki/api/v1/query_range.*"),
+            url=re.compile(r"http://test-loki:7032/loki/api/v1/query_range.*"),
             method="GET",
             json={
                 "data": {
@@ -291,9 +291,9 @@ class TestLokiClientQuery:
     @pytest.mark.asyncio
     async def test_query_error_returns_empty(self, httpx_mock: HTTPXMock):
         """Test that query errors return empty list."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url=re.compile(r"http://test-loki:3100/loki/api/v1/query_range.*"),
+            url=re.compile(r"http://test-loki:7032/loki/api/v1/query_range.*"),
             method="GET",
             status_code=500,
         )
@@ -306,7 +306,7 @@ class TestLokiClientQuery:
     async def test_query_network_error(self, httpx_mock: HTTPXMock):
         """Test handling network errors during query."""
         import httpx
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_exception(httpx.ConnectError("Connection refused"))
 
         results = await client.query()
@@ -320,9 +320,9 @@ class TestLokiClientHealth:
     @pytest.mark.asyncio
     async def test_health_check_success(self, httpx_mock: HTTPXMock):
         """Test successful health check."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url="http://test-loki:3100/ready",
+            url="http://test-loki:7032/ready",
             status_code=200,
             text="ready",
         )
@@ -334,9 +334,9 @@ class TestLokiClientHealth:
     @pytest.mark.asyncio
     async def test_health_check_failure(self, httpx_mock: HTTPXMock):
         """Test failed health check."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_response(
-            url="http://test-loki:3100/ready",
+            url="http://test-loki:7032/ready",
             status_code=503,
         )
 
@@ -348,7 +348,7 @@ class TestLokiClientHealth:
     async def test_health_check_network_error(self, httpx_mock: HTTPXMock):
         """Test health check with network error."""
         import httpx
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         httpx_mock.add_exception(httpx.ConnectError("Connection refused"))
 
         result = await client.health_check()
@@ -362,11 +362,11 @@ class TestLokiClientLifecycle:
     @pytest.mark.asyncio
     async def test_client_reuse(self, httpx_mock: HTTPXMock):
         """Test that the same client is reused."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
 
         # Need two responses since we make two requests
-        httpx_mock.add_response(url="http://test-loki:3100/ready", status_code=200)
-        httpx_mock.add_response(url="http://test-loki:3100/ready", status_code=200)
+        httpx_mock.add_response(url="http://test-loki:7032/ready", status_code=200)
+        httpx_mock.add_response(url="http://test-loki:7032/ready", status_code=200)
 
         await client.health_check()
         client1 = client._client
@@ -380,9 +380,9 @@ class TestLokiClientLifecycle:
     @pytest.mark.asyncio
     async def test_close_clears_client(self, httpx_mock: HTTPXMock):
         """Test that close() clears the client."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
 
-        httpx_mock.add_response(url="http://test-loki:3100/ready", status_code=200)
+        httpx_mock.add_response(url="http://test-loki:7032/ready", status_code=200)
 
         await client.health_check()
         assert client._client is not None
@@ -393,5 +393,5 @@ class TestLokiClientLifecycle:
     @pytest.mark.asyncio
     async def test_close_without_client(self):
         """Test that close() works even if client was never created."""
-        client = LokiClient(base_url="http://test-loki:3100")
+        client = LokiClient(base_url="http://test-loki:7032")
         await client.close()  # Should not raise

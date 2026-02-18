@@ -29,7 +29,13 @@ async def require_app_auth(
     if not x_jarvis_app_id or not x_jarvis_app_key:
         raise HTTPException(status_code=401, detail="Missing app credentials")
 
-    jarvis_auth_base = service_config.get_auth_url()
+    try:
+        jarvis_auth_base = service_config.get_auth_url()
+    except (ValueError, RuntimeError) as e:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Auth service not configured: {e}",
+        ) from e
     app_ping = jarvis_auth_base.rstrip("/") + "/internal/app-ping"
     async with httpx.AsyncClient(timeout=5.0) as client:
         try:
@@ -112,7 +118,7 @@ async def validate_node_credentials(
 
     try:
         jarvis_auth_base = service_config.get_auth_url()
-    except RuntimeError as e:
+    except (ValueError, RuntimeError) as e:
         return NodeValidationResult(valid=False, reason=str(e))
 
     app_id, app_key = _get_service_credentials()

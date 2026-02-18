@@ -9,7 +9,7 @@ COPY app/ ./app
 COPY pyproject.toml .
 RUN pip install --no-cache-dir .
 
-ENV LOG_SERVER_PORT=8006
+ENV LOG_SERVER_PORT=7702
 EXPOSE ${LOG_SERVER_PORT}
 
 CMD uvicorn app.main:app --host 0.0.0.0 --port ${LOG_SERVER_PORT}

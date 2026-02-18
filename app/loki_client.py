@@ -12,7 +12,7 @@ class LokiClient:
     """Client for pushing logs to and querying from Loki."""
 
     def __init__(self, base_url: str | None = None):
-        self.base_url = base_url or os.getenv("LOKI_URL", "http://loki:3100")
+        self.base_url = base_url or os.getenv("LOKI_URL", "http://loki:7032")
         self._client: httpx.AsyncClient | None = None
 
     async def _get_client(self) -> httpx.AsyncClient:

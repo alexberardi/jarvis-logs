@@ -24,10 +24,10 @@ else
         export $(cat .env | grep -v '^#' | xargs)
     fi
 
-    PORT=${LOG_SERVER_PORT:-8006}
+    PORT=${LOG_SERVER_PORT:-7702}
 
     echo "Starting jarvis-logs server locally on port $PORT..."
-    echo "Note: Requires Loki running at ${LOKI_URL:-http://localhost:3100}"
+    echo "Note: Requires Loki running at ${LOKI_URL:-http://localhost:7032}"
     echo ""
     uvicorn app.main:app --reload --host 0.0.0.0 --port $PORT
 fi

@@ -19,7 +19,7 @@ python3 -m venv .venv
 ./run-tests.sh
 
 # Grafana dashboard
-open http://localhost:8015  # admin/jarvis
+open http://localhost:7033  # admin/jarvis
 ```
 
 ## Architecture
@@ -33,15 +33,15 @@ app/
 ├── loki_client.py    # Loki push/query
 └── auth.py           # App-to-app auth
 
-docker-compose.yaml   # Loki (3100), Grafana (3000), API (8006)
+docker-compose.yaml   # Loki (7032), Grafana (3000), API (7702)
 ```
 
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LOKI_URL` | http://loki:3100 | Loki server URL |
-| `LOG_SERVER_PORT` | 8006 | API port |
+| `LOKI_URL` | http://loki:7032 | Loki server URL |
+| `LOG_SERVER_PORT` | 7702 | API port |
 | `LOG_API_KEY` | - | API key for log ingestion |
 | `ADMIN_API_KEY` | - | Admin endpoint protection |
 
@@ -63,16 +63,16 @@ docker-compose.yaml   # Loki (3100), Grafana (3000), API (8006)
 
 ```bash
 # Filter by service, level, time range
-curl "http://localhost:8006/api/v0/logs?service=auth&level=ERROR&since_minutes=60"
+curl "http://localhost:7702/api/v0/logs?service=auth&level=ERROR&since_minutes=60"
 ```
 
 ## Linked Services
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| Loki | 3100 | Log storage/indexing |
-| Grafana | 8015 | Dashboards |
-| API | 8006 | REST interface |
+| Loki | 7032 | Log storage/indexing |
+| Grafana | 7033 | Dashboards |
+| API | 7702 | REST interface |
 
 ## Authentication
 
@@ -85,10 +85,10 @@ Credentials validated against jarvis-auth service.
 - FastAPI, httpx
 
 **Service Dependencies:**
-- ✅ **Required**: Loki (3100) - Log storage and indexing
-- ✅ **Required**: Grafana (8015) - Visualization and dashboards
-- ✅ **Required**: `jarvis-auth` (8007) - App-to-app authentication validation
-- ⚠️ **Optional**: `jarvis-config-service` (8013) - Service discovery
+- ✅ **Required**: Loki (7032) - Log storage and indexing
+- ✅ **Required**: Grafana (7033) - Visualization and dashboards
+- ✅ **Required**: `jarvis-auth` (7701) - App-to-app authentication validation
+- ⚠️ **Optional**: `jarvis-config-service` (7700) - Service discovery
 
 **Used By:**
 - ALL services via `jarvis-log-client` library

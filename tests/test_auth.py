@@ -106,15 +106,15 @@ class TestRequireAppAuth:
 
     @pytest.mark.asyncio
     async def test_auth_url_unavailable(self, mock_request):
-        """Test that unavailable auth URL raises 500-level error."""
-        from jarvis_config_client import ServiceNotFoundError
-        with patch("app.auth.service_config.get_auth_url", side_effect=ServiceNotFoundError("auth")):
-            with pytest.raises((HTTPException, ServiceNotFoundError)):
+        """Test that unavailable auth URL raises 503 error."""
+        with patch("app.auth.service_config.get_auth_url", side_effect=ValueError("Cannot discover jarvis-auth")):
+            with pytest.raises(HTTPException) as exc_info:
                 await require_app_auth(
                     mock_request,
                     x_jarvis_app_id="test-app",
                     x_jarvis_app_key="test-key",
                 )
+            assert exc_info.value.status_code == 503
 
     @pytest.mark.asyncio
     async def test_auth_service_success(self, mock_request, httpx_mock: HTTPXMock):
@@ -290,8 +290,7 @@ class TestValidateNodeCredentials:
     @pytest.mark.asyncio
     async def test_auth_url_unavailable(self):
         """Test that unavailable auth URL returns invalid result."""
-        from jarvis_config_client import ServiceNotFoundError
-        with patch("app.auth.service_config.get_auth_url", side_effect=ServiceNotFoundError("auth")):
+        with patch("app.auth.service_config.get_auth_url", side_effect=ValueError("Cannot discover jarvis-auth")):
             result = await validate_node_credentials("node-1", "key-1", "jarvis-logs")
             assert result.valid is False
             assert "auth" in result.reason.lower()

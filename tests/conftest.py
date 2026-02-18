@@ -9,8 +9,8 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 # Set test environment variables before importing app
-os.environ["LOKI_URL"] = "http://test-loki:3100"
-os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:8007"
+os.environ["LOKI_URL"] = "http://test-loki:7032"
+os.environ["JARVIS_AUTH_BASE_URL"] = "http://test-auth:7701"
 
 
 @pytest.fixture

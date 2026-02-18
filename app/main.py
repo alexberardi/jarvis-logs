@@ -59,7 +59,7 @@ from app import service_config
 _settings_router = create_settings_router(
     service=get_settings_service(),
     auth_dependency=require_app_auth,
-    write_auth_dependency=create_superuser_auth(service_config.get_auth_url),
+    write_auth_dependency=create_superuser_auth(service_config.get_auth_url()),
 )
 app.include_router(_settings_router, prefix="/settings", tags=["settings"])
 
