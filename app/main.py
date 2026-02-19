@@ -4,9 +4,12 @@ from datetime import datetime
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app import service_config
 from app.auth import require_app_auth
 from app.loki_client import loki_client
 from app.routes import logs, node_logs
+from app.services.settings_service import get_settings_service
+from jarvis_settings_client import create_combined_auth, create_settings_router, create_superuser_auth
 
 
 @asynccontextmanager
@@ -51,14 +54,9 @@ app.include_router(
     tags=["node-logs"],
 )
 
-# Add settings router from shared library
-from jarvis_settings_client import create_settings_router, create_superuser_auth
-from app.services.settings_service import get_settings_service
-from app import service_config
-
 _settings_router = create_settings_router(
     service=get_settings_service(),
-    auth_dependency=require_app_auth,
+    auth_dependency=create_combined_auth(service_config.get_auth_url()),
     write_auth_dependency=create_superuser_auth(service_config.get_auth_url()),
 )
 app.include_router(_settings_router, prefix="/settings", tags=["settings"])
