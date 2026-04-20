@@ -1,0 +1,342 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+      "description": "Total proposals created / user decisions in the selected time range. High dismiss or expired share means the proposal confidence is off — tighten eval thresholds or widen `adapter.auto_train_min_examples`.",
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["sum"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_proposal_created\" [$__range]))",
+          "legendFormat": "Created",
+          "queryType": "range",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_proposal_applied\" [$__range]))",
+          "legendFormat": "Applied",
+          "queryType": "range",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_proposal_dismissed\" [$__range]))",
+          "legendFormat": "Dismissed",
+          "queryType": "range",
+          "refId": "C"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_proposal_expired\" [$__range]))",
+          "legendFormat": "Expired",
+          "queryType": "range",
+          "refId": "D"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_deployment_reverted\" [$__range]))",
+          "legendFormat": "Reverted",
+          "queryType": "range",
+          "refId": "E"
+        }
+      ],
+      "title": "Proposal lifecycle — totals",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+      "description": "Event rate over time. Watch for sustained imbalance between Created and (Applied + Dismissed) — proposals accumulating without action suggests users aren't seeing the inbox.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 6 },
+      "id": 2,
+      "options": {
+        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_proposal_created\" [$__interval]))",
+          "legendFormat": "Created",
+          "queryType": "range",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_proposal_applied\" [$__interval]))",
+          "legendFormat": "Applied",
+          "queryType": "range",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_proposal_dismissed\" [$__interval]))",
+          "legendFormat": "Dismissed",
+          "queryType": "range",
+          "refId": "C"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_proposal_expired\" [$__interval]))",
+          "legendFormat": "Expired",
+          "queryType": "range",
+          "refId": "D"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_deployment_reverted\" [$__interval]))",
+          "legendFormat": "Reverted",
+          "queryType": "range",
+          "refId": "E"
+        }
+      ],
+      "title": "Proposal lifecycle — over time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+      "description": "Count of revert actions. A sustained revert count within minutes of apply means the proposal's reported metrics don't match subjective quality — adjust the eval gate threshold or the prompt-provider pairing.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 1 },
+              { "color": "red", "value": 3 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 14 },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["sum"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_deployment_reverted\" [$__range]))",
+          "legendFormat": "Reverts",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Reverts (selected range)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+      "description": "Ratio of applied proposals to all decisions (apply / (apply + dismiss + expire)). Higher = users are saying yes to what we surface.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 0.25 },
+              { "color": "green", "value": 0.5 }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 14 },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["last"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_proposal_applied\" [$__range])) / clamp_min(sum(count_over_time({service=\"jarvis-command-center\"} |~ \"adapter_proposal_(applied|dismissed|expired)\" [$__range])), 1)",
+          "legendFormat": "Apply rate",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Proposal apply rate",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+      "description": "Ratio of reverts to applies. A spike means we shipped a regression.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 0.2 },
+              { "color": "red", "value": 0.5 }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 14 },
+      "id": 5,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["last"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_deployment_reverted\" [$__range])) / clamp_min(sum(count_over_time({service=\"jarvis-command-center\"} |= \"adapter_proposal_applied\" [$__range])), 1)",
+          "legendFormat": "Revert rate",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Revert rate (reverts / applies)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+      "description": "Raw adapter lifecycle events in the selected time range — inspect individual proposals, see the full context payload (pass_rate_before, pass_rate_after, latency_*, time_to_decision_s).",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 20 },
+      "id": 6,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "P8E80F9AEF21F6940" },
+          "editorMode": "code",
+          "expr": "{service=\"jarvis-command-center\"} |~ \"adapter_(proposal|deployment)_\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent adapter events",
+      "type": "logs"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["jarvis", "adapter", "phase-7"],
+  "templating": { "list": [] },
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Adapter Lifecycle (Phase 7)",
+  "uid": "adapter-lifecycle",
+  "version": 1,
+  "weekStart": ""
+}
