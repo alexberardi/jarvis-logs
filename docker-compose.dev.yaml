@@ -13,6 +13,14 @@ services:
       - JARVIS_APP_ID=${JARVIS_APP_ID:-jarvis-logs}
       - JARVIS_APP_KEY=${JARVIS_APP_KEY}
       - JARVIS_CONFIG_URL=${JARVIS_CONFIG_URL:-http://host.docker.internal:7700}
+      # This service sits on jarvis-logs-network, not the shared jarvis-net, so
+      # it cannot resolve the container coords (auth-api:8000) that the default
+      # style returns. 'external' asks for the published pair instead, and
+      # jarvis-config-client sends this container's own config-url hostname as
+      # remote_host, so "localhost" comes back rewritten to host.docker.internal.
+      # Without this passthrough the var is stripped by the environment
+      # allowlist and node log ingestion 403s on "Auth service unavailable".
+      - JARVIS_CONFIG_URL_STYLE=${JARVIS_CONFIG_URL_STYLE:-external}
     extra_hosts:
       - "${DOCKER_HOST_ALIAS:-host.docker.internal}:host-gateway"
     volumes:
